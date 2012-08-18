@@ -1,0 +1,36 @@
+project --name DrSchedule --description "Dr. Schedule : Appointments, Follow-up Remainders and much more..." --contextPath drs --db drs --topLevelPackage com.startupoxygen.drs --version 0.1.0
+
+entity --name Practice --main
+	field --type string --name name --required
+	field --type string --name streetAddress --required
+	field --type string --name city --required
+	field --type string --name state --required
+	field --type string --name zipCode --required
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type email --name altPhone --required
+	field --type url --name website --required
+ 
+entity --name Physician --main
+	field --type string --name name --required
+	field --type string --name specialty --required
+	manytoone --type Practice --name practice --required
+	
+entity --name Appointment --main
+	field --type date --name fromDate --required
+	field --type time --name fromTime --required
+	field --type date --name toDate --required
+	field --type time --name toTime --required
+	field --type string --name reasonForVisit --required
+	manytoone --type Physician --name physician --required
+	
+entity --name InsuranceCo 
+	field --type string --name payerName
+	
+entity --name HealthPlan	
+	field --type string --name planName
+	manytoone --type InsuranceCo --name insuranceCo
+	
+
+ 

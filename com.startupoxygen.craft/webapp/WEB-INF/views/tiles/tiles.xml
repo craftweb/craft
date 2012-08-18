@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+ <!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition name="craft.main" template="/WEB-INF/views/layouts/layout.jsp">
+		<put-attribute name="title"
+			value="This is a configured inner definition." />
+		<put-attribute name="header" value="/WEB-INF/views/layouts/header.jsp" />
+		<put-attribute name="navbar" value="/WEB-INF/views/layouts/navbar.jsp" />
+		<put-attribute name="content" value="/WEB-INF/views/layouts/content.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/layouts/footer.jsp" />
+	</definition>
+	<definition name="craft.entity.new" extends="craft.main">
+		<put-attribute name="content" value="/WEB-INF/views/entity/new.jsp" />
+	</definition>
+	<definition name="craft.entity.view" extends="craft.main">
+		<put-attribute name="content" value="/WEB-INF/views/entity/view.jsp" />
+	</definition>
+	<definition name="craft.entity.edit" extends="craft.main">
+		<put-attribute name="content" value="/WEB-INF/views/entity/edit.jsp" />
+	</definition>
+	<definition name="craft.entity.list" extends="craft.main">
+		<put-attribute name="content" value="/WEB-INF/views/entity/list.jsp" />
+	</definition>
+</tiles-definitions>

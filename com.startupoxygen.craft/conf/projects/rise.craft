@@ -1,0 +1,201 @@
+// Project Optimaze
+project --name "RISE" --description "RISE: Rural Integration for Sustainable Employment" --contextPath rise --db rise --topLevelPackage com.optaamaze.rise --version 0.7.0
+
+
+/////////////////////////////////////////////////////////////////////
+// Contact Information, People and Organization Profiles
+/////////////////////////////////////////////////////////////////////
+entity --name Descriptor --tenantable
+	field --type string --name category
+	field --type string --name key
+	field --type string --name value
+
+entity --name Phone 
+	manytoone --type Descriptor --name type
+	field --type string --name phoneNumber
+	field --type string --name extension
+
+entity --name EmailAddress 
+	manytoone --type Descriptor --name type 
+	field --type email --name emailAddress
+
+entity --name Website 
+	manytoone --type Descriptor --name type
+	field --type url --name url
+
+entity --name InstantMessaging 
+	manytoone --type Descriptor --name type
+	field --type string --name imId
+
+entity --name Address 
+	manytoone --type Descriptor --name type
+	field --type string --name streetAddress 
+	field --type string --name city --required
+	field --type string --name state --required 
+	field --type string --name postalCode
+	field --type string --name country
+
+entity --name ContactInformation 
+	onetomany --type Phone --name phones 
+	onetomany --type EmailAddress --name emailAddresses  
+	onetomany --type Website --name websites 
+	onetomany --type InstantMessaging --name imIds 
+	onetomany --type Address --name addresses 
+
+entity --name PersonName 
+	field --type string --name title
+	field --type string --name firstName
+	field --type string --name middleName
+	field --type string --name lastName
+	field --type string --name suffix
+
+entity --name Passport
+	field --type string --name passportNumber
+	field --type string --name issuedBy
+	field --type string --name placeIssued
+	field --type date --name dateIssued
+	field --type date --name expiryDate
+	field --type boolean --name emigrationCheckRequired
+
+entity --name DriversLicense
+	field --type string --name driversLicenseNumber
+	field --type string --name issuedBy
+	field --type string --name stateIssued
+	field --type string --name placeIssued
+	field --type date --name dateIssued
+	field --type date --name expiryDate
+	onetomany --type DriverseLicenseVehicleType --vehicleTypes
+	
+entity --name DriverseLicenseVehicleType
+	field --type string --name name
+	field --type string --name code
+	field --type text --name description
+		
+entity --name EducationQualification 
+	field --type string --name name
+	field --type string --name university
+	field --type year --name yearCompleted
+	field --type month --name monthCompleted
+	field --type percentage --name percentage
+	field --type float --name gpa
+
+entity --name EmploymentExperience 
+	field --type string --name employerName
+	field --type string --name jobTitle
+	field --type date --name fromDate
+	field --type date --name toDate
+	field --type string --name description
+	field --type string --name reasonForLeaving
+
+entity --name Award 
+	field --type string --name name
+	field --type string --name issuedBy
+	field --type date --name dateIssued
+	field --type string --name description
+
+entity --name Publication 
+	field --type string --name name
+	field --type string --name publishedBy
+	field --type date --name datePublished
+	field --type string --name description
+
+entity --name Patent 
+	field --type string --name name
+	field --type string --name issuedBy
+	field --type string --name assignee
+	field --type date --name dateIssued
+	field --type string --name description
+
+entity --name Person
+	onetoone --type PersonName --name personName 
+	field --type date --name dateOfBirth
+	field --type int --name age --computed Age($this.dateOfBirth)
+	field --type string --name aadhaarNumber --required
+	onetoone --type ContactInformation --name contactInformation 
+	onetoone --type Passport --name passport 
+	onetoone --type DriversLicense --name driversLicense
+	onetomany --type EducationQualification --name educationQualifications 
+	onetomany --type EmploymentExperience --name employmentExperience 
+	onetomany --type Award --name awards 
+	onetomany --type Publication --name publications 
+	onetomany --type Patent --name patents 
+
+entity --name Organization
+	field --type string --name name
+	field --type date --name dateIncorporated
+	field --type string --name type 
+	onetoone --type ContactInformation --name contactInformation 
+
+/////////////////////////////////////////////////////////////////////
+// Optaamaze Specific
+/////////////////////////////////////////////////////////////////////
+
+entity --name State --ownable --main
+	field --type string --name code --required --nameField --summaryField
+	field --type string --name capitalCity --required --summaryField
+	onetoone --type Organization --name organization --required 
+	onetomany --type ministries --name Ministry
+	
+entity --name Ministry --ownable
+	onetoone --type Organization --name organization --required 
+	onetoone --type Person --name minister --required 
+	manytoone --type State --name state 
+	onetomany --type Department --name departments 
+
+entity --name Department --ownable
+	onetoone --type Organization --name organization --required 
+	manytoone --type Ministry --name ministry 
+	onetomany --type Program --name programs 
+
+entity --name Program --ownable
+	onetoone --type Organization --name organization --required 
+	manytoone --type Department --name department --required
+	
+entity --name TrainingProviderEmpanelment --ownable
+	field --type date --name dateRequested --required
+	field --type date --name dateApproved --required
+	field --type date --name fromDate --required
+	field --type date --name toDate 
+	manytoone --type TrainingProvider --name trainingProvider 
+	manytoone --type Program --name program
+
+entity --name EmploymentAgencyEmpanelment --ownable
+	field --type date --name dateRequested --required
+	field --type date --name dateApproved --required
+	field --type date --name fromDate --required
+	field --type date --name toDate 
+	manytoone --type EmploymentAgency --name employmentAgency 
+	manytoone --type Program --name program
+
+entity --name TrainingProvider --ownable --main
+	onetoone --type Organization --name organization --required 
+
+entity --name EmploymentAgency --ownable --main
+	onetoone --type Organization --name organization --required 
+
+entity --name Candidate --ownable --main --main
+	onetoone --type Person --name Person --required
+	field --type string --name pfNumber --required --unique
+	field --type string --name esiNumber --required --unique
+	manytomany --type JobPosting --name matchinJobPostings 
+	
+entity --name JobPosting --ownable --main
+	field --type string --name jobHeading --required --nameField --summaryField
+	field --type string --name jobTitle --required --summaryField
+	field --type string --name jobCity --required --summaryField
+	field --type string --name jobState --required --summaryField
+	field --type date --name datePosted
+	field --type date --name dateLastUpdated
+	field --type text --name jobDescription --required
+	field --type string --name employmentAgencyName --required
+	field --type string --name jobPosterName --required
+	field --type string --name jobPosterEmailAddress --required
+	field --type string --name jobPosterMobileNumber --required
+	field --type boolean --name verified --required
+	manytoone --type EmploymentAgency --name employmentAgency --required
+	manytomany --type Candidate --name matchingCandidates
+	manytomany --type TrainingProvider --name matchingTraingProviders
+						
+build project
+
+exit

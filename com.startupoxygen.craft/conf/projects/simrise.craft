@@ -1,0 +1,152 @@
+// Project Optimaze
+project --name "SIMRISE" --description "SIMRISE: Rural Integration for Sustainable Employment" --contextPath simrise --db simrise --topLevelPackage com.optaamaze.simrise --version 0.7.0
+
+entity --name State --ownable --main
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name code --required --summaryField
+	field --type string --name capitalCity --required --summaryField
+	field --type string --name streetAddress 
+	field --type string --name city --required
+	field --type string --name state --required 
+	field --type string --name postalCode
+	field --type string --name country
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+	onetomany --type ministries --name Ministry
+	
+entity --name Ministry --ownable --main
+	field --type string --name name --required
+	field --type string --name ministerName --required 
+	field --type string --name streetAddress 
+	field --type string --name city --required
+	field --type string --name state --required 
+	field --type string --name postalCode
+	field --type string --name country 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+	manytoone --type State --name state --dropdown
+	onetomany --type Department --name departments 
+
+entity --name Department --ownable
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name inchargeOfficer --required --summaryField
+	field --type string --name streetAddress 
+	field --type string --name city --required --summaryField
+	field --type string --name state --required 
+	field --type string --name postalCode
+	field --type string --name country 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+	manytoone --type Ministry --name ministry 
+	onetomany --type Program --name programs 
+
+entity --name Program --ownable
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name inchargeOfficer --required --summaryField
+	field --type string --name streetAddress 
+	field --type string --name city --required --summaryField
+	field --type string --name state --required 
+	field --type string --name postalCode
+	field --type string --name country 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+	manytoone --type Department --name department --required
+	
+entity --name TrainingProviderEmpanelment --ownable
+	field --type date --name dateRequested --required
+	field --type date --name dateApproved --required
+	field --type date --name fromDate --required
+	field --type date --name toDate 
+	manytoone --type TrainingProvider --name trainingProvider 
+	manytoone --type Program --name program
+
+entity --name EmploymentAgencyEmpanelment --ownable
+	field --type date --name dateRequested --required
+	field --type date --name dateApproved --required
+	field --type date --name fromDate --required
+	field --type date --name toDate 
+	manytoone --type EmploymentAgency --name employmentAgency 
+	manytoone --type Program --name program
+
+entity --name TrainingProvider --ownable --main
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name contactPersonName --required --summaryField
+	field --type string --name streetAddress 
+	field --type string --name city --required --summaryField
+	field --type string --name state --required  --summaryField
+	field --type string --name postalCode
+	field --type string --name country 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+
+entity --name EmploymentAgency --ownable --main
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name contactPersonName --required --summaryField
+	field --type string --name streetAddress 
+	field --type string --name city --required --summaryField
+	field --type string --name state --required  --summaryField
+	field --type string --name postalCode
+	field --type string --name country 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+
+entity --name Candidate --ownable --main --main
+	field --type string --name name --required --nameField --summaryField
+	field --type string --name contactPersonName --required --summaryField
+	field --type string --name presentStreetAddress 
+	field --type string --name presentCity --required --summaryField
+	field --type string --name presentState --required  --summaryField
+	field --type string --name presentPostalCode
+	field --type string --name presentCountry 
+	field --type string --name permanentStreetAddress 
+	field --type string --name permanentCity --required --summaryField
+	field --type string --name permanentState --required  --summaryField
+	field --type string --name permanentPostalCode
+	field --type string --name permanentCountry 
+	field --type email --name email --required
+	field --type email --name altEmail --required
+	field --type string --name phone --required
+	field --type string --name altPhone --required
+	field --type url --name website --required
+	field --type string --name pfNumber --required --unique
+	field --type string --name esiNumber --required --unique
+	manytomany --type JobPosting --name matchinJobPostings 
+	
+entity --name JobPosting --ownable --main
+	field --type string --name jobHeading --required --nameField --summaryField
+	field --type string --name jobTitle --required --summaryField
+	field --type string --name jobCity --required --summaryField
+	field --type string --name jobState --required --summaryField
+	field --type date --name datePosted
+	field --type date --name dateLastUpdated
+	field --type text --name jobDescription --required
+	field --type string --name employmentAgencyName --required
+	field --type string --name jobPosterName --required
+	field --type string --name jobPosterEmailAddress --required
+	field --type string --name jobPosterMobileNumber --required
+	field --type boolean --name verified --required
+	manytoone --type EmploymentAgency --name employmentAgency --required
+	manytomany --type Candidate --name matchingCandidates
+	manytomany --type TrainingProvider --name matchingTraingProviders
+						
+build project
+
+exit

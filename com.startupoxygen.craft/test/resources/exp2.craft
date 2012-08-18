@@ -1,0 +1,455 @@
+// Project Optimaze
+project --name optimaze --topLevelPackage com.startupoxygen.optimaze --version 0.7.0
+
+// Project-wide properties
+property com.startupoxygen.naming.strategy --value strict
+property com.startupoxygen.web.tier --value springmvc
+property com.startupoxygen.persistence.strategy --value springjdbctemplate
+property com.startupoxygen.tenant.strategy --value tenantid
+property com.startupoxygen.id.field.name --value soid
+property com.startupoxygen.id.field.type --value uuid
+
+
+// All entities will have the following synthetic fields
+entity Base --abstract
+	field --type user --name createdBy
+	field --type date --name dateCreated
+	field --type user --name lastModifiedBy
+	field --type date --name dateLastModified
+	
+// Multi-tenancy Support With --tenantable
+entity Tenantable --abstract --extends Base
+	field --type string --name tenant
+	
+// Auditable entities
+entity AuditableEntity --abstract
+	field --type date --name dateModified
+	field --type bigdecimal --name revisionNumber
+	field --type string --name entityName
+	field --type text --name contentSnapshot
+	
+// Auditable field
+entity AuditableField --abstract
+	field --type string --name entity
+	field --type string --name fieldref
+	field --type date --name dateModified
+	field --type text --name canonicalTextBefore
+	field --type text --name canonicalTextAfter
+		
+	
+/////////////////////////////////////////////////////////////////////
+// Contact Information, People and Organization Profiles
+/////////////////////////////////////////////////////////////////////
+entity --name Descriptor --tenantable
+	field --type string --name category --required --minsize 2
+	field --type string --name key --required --minsize 2
+	field --type string --name value --required --minsize 2
+
+entity --name Phone 
+	manytoone --type Descriptor --name type --required --constraint "$this.type.category=='Phone'"
+	field --type string --name phoneNumber --required --minsize 2
+	field --type string --name extension 
+
+entity --name EmailAddress 
+	manytoone --type Descriptor --name type --required --constraint "$this.type.category=='EmailAddress'" 
+	field --type email --name emailAddress --required 
+
+entity --name Website 
+	manytoone --type Descriptor --name type --required --constraint "$this.type.category=='Website'"
+	field --type url --name url --required 
+
+entity --name InstantMessaging 
+	manytoone --type Descriptor --name type --required --constraint "$this.type.category=='InstantMessaging'"
+	field --type string --name imId --required --minsize 2
+
+entity --name Address 
+	manytoone --type Descriptor --name type --required --constraint "$this.type.category=='Address'"
+	field --type string --name streetAddress  --required --minsize 2
+	field --type string --name city --required --minsize 2
+	field --type string --name state --required --minsize 2
+	field --type string --name postalCode --minsize 2
+	field --type string --name country --minsize 2
+
+entity --name ContactInformation 
+	onetomany --type Phone --name phones 
+	onetomany --type EmailAddress --name emailAddresses  
+	onetomany --type Website --name websites 
+	onetomany --type InstantMessaging --name imIds 
+	onetomany --type Address --name addresses 
+
+entity --name PersonName 
+	field --type string --name title
+	field --type string --name firstName --required --minsize 2
+	field --type string --name middleName
+	field --type string --name lastName --required --minsize 2
+	field --type string --name suffix
+
+entity --name Passport
+	field --type string --name passportNumber --required --minsize 2
+	field --type string --name issuedBy --required --minsize 2
+	field --type string --name placeIssued --required --minsize 2
+	field --type date --name dateIssued --required --pastorpresent
+	field --type date --name expiryDate --required --presentorfuture
+	field --type boolean --name emigrationCheckRequired --required 
+
+entity --name DriversLicense
+	field --type string --name driversLicenseNumber --required --minsize 2
+	field --type string --name issuedBy --required --minsize 2
+	field --type string --name stateIssued --required --minsize 2
+	field --type string --name placeIssued --required --minsize 2
+	field --type date --name dateIssued --required --pastorpresent
+	field --type date --name expiryDate --required --presentorfuture
+	onetomany --type DriverseLicenseVehicleType --name vehicleTypes --required 
+	
+entity --name DriverseLicenseVehicleType
+	field --type string --name name --required --minsize 2
+	field --type string --name code --required --minsize 2
+	field --type text --name description --required --minsize 2
+		
+entity --name EducationQualification 
+	field --type string --name name --required --minsize 2
+	field --type string --name university --required --minsize 2
+	field --type year --name yearCompleted --required 
+	field --type month --name monthCompleted --required 
+	field --type percentage --name percentage
+	field --type float --name gpa
+
+entity --name EmploymentExperience 
+	field --type string --name employerName --required --minsize 2
+	field --type string --name jobTitle --required --minsize 2
+	field --type date --name fromDate --required --pastorpresent
+	field --type date --name toDate --required --pastorpresent
+	field --type string --name description --required --minsize 2
+	field --type string --name reasonForLeaving --required --minsize 2
+
+entity --name Award 
+	field --type string --name name --required --minsize 2
+	field --type string --name issuedBy --required --minsize 2
+	field --type date --name dateIssued --required --pastorpresent
+	field --type string --name description --required --minsize 2
+
+entity --name Publication 
+	field --type string --name name --required --minsize 2
+	field --type string --name publishedBy --required --minsize 2
+	field --type date --name datePublished --required --minsize 2
+	field --type string --name description --required --minsize 2
+
+entity --name Patent 
+	field --type string --name name --required --minsize 2
+	field --type string --name issuedBy --required --minsize 2
+	field --type string --name assignee --required --minsize 2
+	field --type date --name dateIssued --required --pastorpresent
+	field --type string --name description --required --minsize 2
+
+entity --name Person 
+	onetoone --type PersonName --name personName --required 
+	field --type date --name dateOfBirth --required --pastorpresent
+	field --type int --name age --required --computed "($today - $this.dateOfBirth)/365"
+	field --type string --name aadhaarNumber --required
+	onetoone --type ContactInformation --name contactInformation 
+	onetoone --type Passport --name passport 
+	onetoone --type DriversLicense --name driversLicense
+	onetomany --type EducationQualification --name educationQualifications 
+	onetomany --type EmploymentExperience --name employmentExperience 
+	onetomany --type Award --name awards 
+	onetomany --type Publication --name publications 
+	onetomany --type Patent --name patents 
+
+entity --name Organization 
+	field --type string --name name --required --minsize 2
+	field --type date --name dateIncorporated --required --pastorpresent
+	field --type string --name type --required --minsize 2
+	onetoone --type ContactInformation --name contactInformation 
+
+/////////////////////////////////////////////////////////////////////
+// Optimaze Specific
+/////////////////////////////////////////////////////////////////////
+
+entity --name State --ownable --main
+	field --type string --name code --required --minsize 2
+	field --type string --name capitalCity --required --minsize 2
+	onetoone --type Organization --name organization --required 
+	onetomany --type ministries --name Ministry
+
+focus --entity State
+	validation --type unique --fieldref organization.name
+	
+entity --name Ministry --ownable --main
+	onetoone --type Organization --name organization --required 
+	onetoone --type Person --name minister --required 
+	manytoone --type State --name state --required  
+	onetomany --type Department --name departments 
+
+focus --entity Ministry
+	validation --type unique --fieldref organization.name
+
+entity --name Department --ownable --main
+	onetoone --type Organization --name organization --required 
+	manytoone --type Ministry --name ministry --required 
+	onetomany --type Program --name programs 
+
+focus --entity Department 
+	validation --type unique --fieldref organization.name
+
+entity --name Program --ownable --main
+	onetoone --type Organization --name organization --required 
+	manytoone --type Department --name department --required
+	
+entity --name TrainingProviderEmpanelment --ownable --main
+	field --type date --name dateRequested --required --pastorpresent
+	field --type date --name dateApproved --required --pastorpresent
+	field --type date --name fromDate --required --pastorpresent
+	field --type date --name toDate --presentorfuture
+	manytoone --type TrainingProvider --name trainingProvider --required  
+	manytoone --type Program --name program --required 
+
+entity --name EmploymentAgencyEmpanelment --ownable --main
+	field --type date --name dateRequested --required --pastorpresent
+	field --type date --name dateApproved --required --pastorpresent
+	field --type date --name fromDate --required --presentorfuture
+	field --type date --name toDate --presentorfuture
+	manytoone --type EmploymentAgency --name employmentAgency --required  
+	manytoone --type Program --name program --required 
+
+entity --name TrainingProvider --ownable --main
+	onetoone --type Organization --name organization --required 
+
+entity --name EmploymentAgency --ownable --main
+	onetoone --type Organization --name organization --required 
+
+entity --name Candidate --ownable --main
+	onetoone --type Person --name person --required
+	field --type string --name pfNumber --required --unique --minsize 2
+	field --type string --name esiNumber --required --unique --minsize 2
+	manytomany --type JobPosting --name matchinJobPostings 
+
+focus --entity Candidate
+	validation --type unique --fieldref person.aadhaarNumber
+	validation --type unique --fieldref person.passport.passportNumber
+	
+entity --name JobPosting --ownable --main
+	field --type string --name jobTitle --required --minsize 2
+	field --type string --name jobCity --required --minsize 2
+	field --type string --name jobState --required --minsize 2
+	field --type date --name datePosted --required --pastorpresent
+	field --type date --name dateLastUpdated --required --pastorpresent
+	field --type string --name jobDescription --required
+	field --type string --name employmentAgencyName --required
+	field --type string --name jobPosterName --required
+	field --type string --name jobPosterEmailAddress --required
+	field --type string --name jobPosterMobileNumber --required
+	field --type boolean --name verified --required
+	manytoone --type EmploymentAgency --name employmentAgency --required
+	manytomany --type Candidate --name matchingCandidates
+	manytomany --type TrainingProvider --name matchingTraingProviders
+	
+layout --name standardSingleColumnLayout --new --edit --entity *
+	section --name standardSection  --onecolumntabular --onerowperfield
+	section --name relatedLists --showaddbutton --showeditlink --showdeletelink				
+
+layout --name candidateEditLayout --new --edit --entity Candidate
+	section --name basicInfoSection --heading "Basic Information"  
+		table --cols 5 --rows 5 --autofit --width 100%
+			row 
+				col --field title --widget comboplus
+				col --field firstName --widget textbox
+				col --field middleName --widget textbox
+				col --field lastName --widget textbox
+				col --field suffix --widget comboplus
+			row
+				col --field dateOfBirth --widget calendar
+				col --field reservation --widget textbox
+				col --field religion --widget textbox
+				col --field caste --widget textbox
+				col --field gender --widget radio
+			row --mergecells 4-5
+				col --field nationality --widget textbox
+				col --field rationCard --widget textbox
+				col --field panCard --widget textbox
+				col --field aadhaarNumber --widget textbox  
+			row
+				col --field passportNumber --widget textbox
+				col --field placeIssued --widget textbox
+				col --field dateIssue --widget calendar
+				col --field expiryDate --widget calendar
+				col --field ecnr --widget checkbox	
+			row
+				col --field driverLicenseNumber --widget textbox
+				col --field placeIssued --widget textbox
+				col --field dateIssue --widget calendar
+				col --field expiryDate --widget calendar
+				col --field vehicleTypes --widget dropdown	
+			 
+	section --name contactInfoSection --heading "Contact Information" --source contactInformation
+	section --name eduHistorySection --heading "Education History" --source educationQualifications --orderby "yearCompleted DESC, monthCompleted DESC" --addmorerows 3
+		table --cols 6 --autofit --width 100% --highlighting odd,even
+			foreach --field educationQualifications
+				row 
+					col --field degree --widget textbox --autocomplete
+					col --field university --widget textbox --autocomplete
+					col --field monthCompleted --widget monthdropdown --print "/" --field yearCompleted --widget yeardropwdown
+					col --field percentage --widget percentage
+					col --field gpa --widget textbox
+			endforeach
+			
+	section --name empHistorySection --heading "Employment History"  --orderby "fromDate DESC, toDate DESC" --addmorerows 3
+		table --cols 4 --autofit --width 100% --highlighting odd,even
+			foreach --field employmentExperience
+				row
+					col --field designation --widget textbox --autocomplete
+					col --field company --widget textbox --autocomplete
+					col --field fromDate --widget calendar
+					col --field toDate --widget calendar
+			endforeach
+
+layout --view --entity Candidate --allowinlineedits
+	render --layout candidateEditLayout --section basicInfoSection --readonly
+	render --layout candidateEditLayout --section eduHistoryInfoSection --readonly
+	render --layout candidateEditLayout --section empHistorySection --readonly
+		
+	section --name awardsSection --heading "Awards" --source awards --addnew
+		table --cols 1 --autofit --width 100% --highlighting odd,even
+			foreach --field awards 
+				row --style bold --field dateIssued --print ":"  --field name 
+				row --style normal --print "from" --field issuedBy 
+				row --field description --widget snippet --widget:max 100 --widget:removeformatting --widget:crlftobr --widget:showreadmore 
+			endforeach
+					
+	section --name publicationsSection --heading "Publications" --source publications --addnew
+		table --cols 1 --autofit --width 100% --highlighting odd,even
+			foreach --field publications 
+				row --style bold --field datePublished --print ":"  --field name 
+				row --style normal --print "from" --field publishedBy 
+				row --field description --widget snippet --widget:max 100 --widget:removeformatting --widget:crlftobr --widget:showreadmore 
+			endforeach
+					
+	
+	section --patentsSection --heading "Patents" --source patents --addnew
+		table --cols 1 --autofit --width 100% --highlighting odd,even
+			foreach --field patents 
+				row --style bold --field dateIssued --print ":"  --field name 
+				row --style normal --print "from" --field issuedBy  --print " Assigneee:" --field assignee
+				row --field description --widget snippet --widget:max 100 --widget:removeformatting --widget:crlftobr --widget:showreadmore 
+			endforeach
+					
+/////////////////////////////////////////////////////////////////////
+// Security
+/////////////////////////////////////////////////////////////////////	
+
+// A user assigned with a SystemAdministrator role cannot have other roles.  
+role --name SystemAdministrator --superuser
+// SystemAdministrator shoul dbe able to create State objects and delegate the maintenance to the respective StateAdministrator.
+// So a StateAdministrator user is mapped to a particular state record?
+	grant --permission create --permission purge --permission --role SystemAdministrator --entity State
+// SystemAdministrator should be able to purge all records marked as "deleted". Typical purge policy will be to delete records that are at least 100 days old.
+	grant --permission purge --role SystemAdministrator
+		
+// A user should be administrator for one and only one State. However, there can be more than one owner for State.
+role --name StateAdministrator
+// StateAdministrator should own the State record and have permissions to update the record as needed. 
+	grant --permission owner --permission update --role StateAdministrator --entity State --filterby "ownership = :self"
+// However, the StateAdministrator should not have the permission to change the name field of the state record.
+	revoke --permission update --role StateAdministrator --entity State --field name --filterby "ownership = :self"
+// StateAdministrator should be able to create the Ministry records and delegate the maintenance to the respective MinistryAdministrator.
+	grant --permission create --role StateAdministrator --entitty Ministry --filterby "Ministry.state = :self"
+
+// A user should be administrator for one and only one Ministry. However, there can be more than one owner for Ministry.
+role --name MinistryAdministrator
+// MinistryAdministrator show own the Ministry record and have permissions to update the record as needed.
+	grant --permission update --permission owner --role MinistryAdministrator --entity Ministry --filterby "ownership = :self"
+// However, the MinistryAdministrator should not have the permission to change the value of name field of the Ministry entity.
+	revoke --permission update --role StateAdministrator --entity Ministry --field name --filterby "ownership = :self"	
+	
+	grant --permission create --role MinistryAdministrator --permission update --permission ownership --entity Department --filterby "Department.ministry = :self"
+	
+// A user should be administrator for one and only one Department. However, there can be more than one owner for Department.
+role --name DepartmentAdministrator
+	grant --permission update --role DepartmentAdministrator --entity Department --filterby "ownership = :self"
+	grant --permission create --role DepartmentAdministrator --permission update --permission ownership --entity Program --filterby "Program.department = :self"
+
+// A user should be administrator for one and only one Program. However, there can be more than one owner for Program.
+role --name ProgramAdministrator
+	grant --permission update --entity Program --filterby ownership = :self
+	grant --permission create --permission update --permission ownership --role ProgramAdministrator --entity TrainingProviderEmpanelment --filterby "ownership = :self"
+	grant --permission create --permission update --permission ownership --role ProgramAdministrator --entity EmploymentAgencyEmpanelment --filterby "ownership = :self"
+
+// A user should be administrator for one and only one TrainingProvider. However, there can be more than one owner for TrainingProvider.
+role --name TrainingProviderAdministrator
+	grant --update --role TrainingProviderAdministrator --entity TrainingProvider --filterby "ownership = :self"
+	grant --ownership --create --retrieve --update --delete --role TrainingProviderAdministrator --entity Candidate --filterby "ownership = :self"
+
+// A user should be administrator for one and only one EmploymentAgencyAdministrator. However, there can be more than one owner for EmploymentAgency.
+role --name EmploymentAgencyAdministrator
+	grant --ownership --create --retrieve --update --role EmploymentAgencyAdministrator --entities EmploymentAgency --filterby "ownership = :self"
+	grant --ownership --create --retrieve --update --delete --role EmploymentAgencyAdministrator --entity JobPosting --filterby "ownership = :self"
+
+// A user should be administrator for one and only one Candidate.
+role --name CandidateAdministrator
+	grant --ownership --create --retrieve --update --delete --role EmploymentAgencyAdministrator --entity Candidate --filterby "ownership = :self"
+
+
+// Role Hierarchy example CEO can do what VPSales does who in turn can do what RegionalSalesManager -> AreaSalesManager -> ...
+role --name SalesRepresentative
+
+compositerole --name SalesSuperVisor
+	contains --role SalesRepresentative
+
+compositerole --name AreaSalesManager
+	contains --role --name SalesSupervisor
+
+compositerole --name RegionalSalesManager
+	contains --role --name AreaSalesManager
+
+compositerole --name VPSales
+	contains --role RegionalSalesManager
+	
+compositerole --name CEO
+	contains --role VPSales
+
+rolehierarchy
+role --level 1 			--name CEO 
+role --level 1.1 		--name VPSales
+role --level 1.1.1 		--name RegionalSalesManagerNorth
+role --level 1.1.1.1 	--name AreaSalesManagerNorth
+role --level 1.1.1.1.1 	--name SalesSupervisorNorth
+role --level 1.1.1.1.1 	--name SalesRepresentativeNorth
+role --level 1.2 		--name RegionalSalesManagerSouth
+role --level 1.2.1 		--name AreaSalesManagerSouth
+role --level 1.2.1.1 	--name SalesSupervisorSouth
+role --level 1.2.1.1.1 	--name SalesRepresentativeSouth
+role --level 1.3 		--name RegionalSalesManagerEast
+role --level 1.3.1 		--name AreaSalesManagerEast
+role --level 1.3.1.1 	--name SalesSupervisorEast
+role --level 1.3.1.1.1 	--name SalesRepresentativeEast
+role --level 1.4 		--name RegionalSalesManagerWest
+role --level 1.4.1 		--name AreaSalesManagerWest
+role --level 1.4.1.1 	--name SalesSupervisorWest
+role --level 1.4.1.1.1 	--name SalesRepresentativeWest
+
+rolehierarchy
+--level 1 --role SystemAdministrator
+--level 2 --role State
+--level 3 --role Ministry
+--level 4 --role Department
+--level 5 --role Program
+--level 6 --role TrainingProvider
+--level 6 --role EmploymentAgency
+	
+EmploymentAgencyAdministrator/TrainingProvider requests ProgramAdministrator for empanelment. 
+ProgramAdministrator approves and enters effective from and to dates of empanelment.
+
+	
+crietria
+	Program.department.ministry.satate = :state
+		
+	
+data
+	permissoins
+	subset of data
+		permissions
+		users
+		roles	
+					
+build project
+
+exit

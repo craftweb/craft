@@ -1,0 +1,293 @@
+// Project Optimaze
+
+property com.startupoxygen.naming.strategy --value strict
+property com.startupoxygen.web.tier --value springmvc
+property com.startupoxygen.persistence.strategy --value springjdbctemplate
+property com.startupoxygen.tenant.strategy --value tenantid
+property com.startupoxygen.id.field.name --value soid
+property com.startupoxygen.id.field.type --value uuid
+
+project optimaze --topLevelPackage com.startupoxygen.optimaze --versionNumber 0.7.0
+
+role SystemAdministrator --superuser
+	grant oc --entity State
+role StateAdministrator
+	grant u --entity State
+	grant ocu --entities Ministry
+role MinistryAdministrator
+	grant u --entity Ministry
+	grant ocu --entity Department
+role DepartmentAdministrator
+	grant u --entity Department
+	grant ocu --entity Program
+role ProgramAdministrator
+	grant u --entity Program
+role TrainingProviderAdministrator
+	grant ocru --entity TrainingProvider
+	grant ocrud --entity Candidate
+role EmploymentAgencyAdministrator
+	grant ocru --entities EmploymentAgency
+	grant ocrud JobPosting
+role CandidateAdministrator
+	grant ocrud --entity Candidate
+
+/////////////////////////////////////////////////////////////////////
+// Contact Information, People and Organization Profiles
+/////////////////////////////////////////////////////////////////////
+entity Descriptor --tenantable
+	field string category
+	field string key
+	field string value
+
+entity Phone 
+	manytoone Descriptor type 
+		--constraint $this.type.category=="Phone"
+	field string phoneNumber
+	field string extension
+
+entity EmailAddress 
+	manytoone Descriptor type 
+		--constraint $this.type.category=="EmailAddress" 
+	email emailAddress
+
+entity Website 
+	manytoone Descriptor type 
+		--constraint $this.type.category=="Website"
+	field url url
+
+entity InstantMessaging 
+	manytoone Descriptor type 
+		--constraint $this.type.category=="InstantMessaging"
+	field string imId
+
+entity Address 
+	manytoone Descriptor type 
+		--constraint $this.type.category=="Address"
+	field string streetAddress 
+	field string city --required
+	field string state --required 
+	field string postalCode
+	field string country
+
+entity ContactInformation 
+	onetomany phones Phone
+	onetomany emailAddresses EmailAddress 
+	onetomany websites Website
+	onetomany imIds InstantMessaging
+	onetomany addresses Address
+
+entity PersonName 
+	field string title
+	field string firstName
+	field string middleName
+	field string lastName
+	field string suffix
+
+entity EducationQualification 
+	field string name
+	field string university
+	field year yearCompleted
+	field month monthCompleted
+	field percentage percentage
+	field float gpa
+
+entity EmploymentExperience 
+	field string employerName
+	field string jobTitle
+	field date fromDate
+	field date toDate
+	field string description
+	field string reasonForLeaving
+
+entity Award 
+	field string name
+	field string issuedBy
+	field date dateIssued
+	field string description
+
+entity Publication 
+	field string name
+	field string publishedBy
+	field date datePublished
+	field string description
+
+entity Patent 
+	field string name
+	field string issuedBy
+	field date dateIssued
+	field string description
+
+entity Person 
+	onetoone personName PersonName
+	field date dateOfBirth
+	field int age --computed Age($this.dateOfBirth)
+	onetoone ContactInformation contactInformation 
+	onetomany EducationQualification educationQualifications 
+	onetomany EmploymentExperience employmentExperience 
+	onetomany Award awards 
+	onetomany Publication publications 
+	onetomany Patent patents 
+
+entity Organization 
+	field string name
+	field date dateIncorporated
+	field string type 
+	onetoone ContactInformation contactInformation 
+
+/////////////////////////////////////////////////////////////////////
+// Optimaze Specific
+/////////////////////////////////////////////////////////////////////
+
+entity State --ownable
+	field string name --required --size(min=2, max=255)
+	field string code --required
+	field string capitalCity --required
+	onetoone Organization organization --required 
+	onetomany ministries Ministry
+
+entity Ministry --ownable
+	onetoone Organization organization --required 
+	onetoone Person minister --required 
+	manytoone State state 
+	onetomany Department departments 
+
+entity Department --ownable
+	field string name --required
+	onetoone Organization organization --required 
+	manytoone Ministry ministry 
+	onetomany Program programs 
+
+entity Program --ownable
+	onetoone Organization organization --required 
+	manytoone Department department --required 
+
+entity TrainingProvider --ownable
+	onetoone Organization organization --required 
+
+entity EmploymentAgency --ownable
+	onetoone Organization organization --required 
+
+entity Candidate --ownable
+	onetoone person --required Person
+	field string pfNumber --required
+	field string esiNumber --required
+	manytomany JobPosting matchinJobPostings 
+
+entity JobPosting --ownable
+	field string jobTitle --required
+	field string jobCity --required
+	field string jobState --required
+	field date datePosted
+	field date dateLastUpdated
+	field string jobDescription --required
+	field string employmentAgencyName --required
+	field string jobPosterName --required
+	field string jobPosterEmailAddress --required
+	field string jobPosterMobileNumber --required
+	field boolean verified --required
+	manytoone EmploymentAgency employmentAgency --required
+	manytomany Candidate matchingCandidates
+	manytomany TrainingProvider matchingTraingProviders
+
+layout --new --edit --view --entity Candidate
+	section --heading "Basic Information"  
+		table --cols 5 --rows 5 --autofit --width 100%
+			row 
+				col --field title --widget comboplus
+				col --field firstName --widget textbox
+				col --field middleName --widget textbox
+				col --field lastName --widget textbox
+				col --field suffix --widget comboplus
+			row
+				col --field dateOfBirth --widget calendar
+				col --field reservation --widget textbox
+				col --field religion --widget textbox
+				col --field caste --widget textbox
+				col --field gender --widget radio
+			row --mergecells 4-5
+				col --field nationality --widget textbox
+				col --field rationCard --widget textbox
+				col --field panCard --widget textbox
+				col --field aadhaarNumber --widget textbox  
+			row
+				col --field passportNumber --widget textbox
+				col --field placeIssued --widget textbox
+				col --field dateIssue --widget calendar
+				col --field expiryDate --widget calendar
+				col --field ecnr --widget checkbox	
+			row
+				col --field driverLicenseNumber --widget textbox
+				col --field placeIssued --widget textbox
+				col --field dateIssue --widget calendar
+				col --field expiryDate --widget calendar
+				col --field vehicleTypes --widget dropdown	
+			 
+	section --heading "Contact Information" --source contactInformation
+	section --heading "Education History" --source educationQualifications --orderby yearCompleted DESC, monthCompleted DESC
+		table --cols 6 --autofit --width 100%
+			col --field degree --widget textbox --autocomplete
+			col --field university --widget textbox --autocomplete
+			col --field monthCompleted --widget monthdropdown
+				--print "/"
+			 	--field yearCompleted --widget yeardropwdown
+			col --field percentage --widget percentage
+			col --field gpa --widget textbox
+			
+	section --heading "Employment History" --source employmentExperience --orderby fromDate DESC, toDate DESC
+		table --cols 4 --autofit --width 100%
+			col --field designation --widget textbox --autocomplete
+			col --field company --widget textbox --autocomplete
+			col --field fromDate --widget calendar
+			col --field toDate --widget calendar
+	
+	section --heading "Awards" --source awards
+	section --heading "Publications" --source publications
+	section --heading "Patents" --source patents
+
+begin preformatted
+ +------------------------------------------------------------------------------------------------------------------+
+ | V Basic Information                                                                                              |                         
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ | title:            | firstName:                |  middleName:        | lastName:                  | suffix:       |
+ | ______________1V+ | _________________________ | ___________________ | __________________________ | __________1V+ |
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ | dateOfBirth:      | reservation:              | religion:           | caste:                     | gender:       |
+ | ______________CAL | _________________________ | ___________________ | __________________________ | (.) M ( ) F   |
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ | nationality:      | rationCard:               | panCard             | aadhaarNumber:                             |
+ | ________________V | _________________________ | ___________________ | __________________________________________ |
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ | passport:         | placeIssued:              | dateIssued          | expiryDate:                | ecnr          |
+ | _________________ | _________________________ | ________________CAL | _______________________CAL | [ X ]         | 
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ | driverLicense:    | placeIssued:              | dateIssued          | expiryDate:                | vehicleTypes  |
+ | _________________ | _________________________ | ________________CAL | _______________________CAL | ___________*V | 
+ +-------------------+---------------------------+---------------------+----------------------------+---------------+
+ 
+ +------------------------------------------------------------------------------------------------------------------+
+ | V Education History                                                                             + Add More Rows  |                         
+ +----------------------------+----------------------------------------+--------------------+------------+----------+
+ | degree                     | univesity                              |  month/year        | percentage | gpa      |
+ +----------------------------+----------------------------------------+--------------------+------------+----------+
+ | ________________________AC | ____________________________________AC | _____V / ________V | __________ | ________ |
+ +----------------------------+----------------------------------------+--------------------+------------+----------+
+ | ________________________AC | ____________________________________AC | _____V / ________V | __________ | ________ |
+ +----------------------------+----------------------------------------+--------------------+------------+----------+
+
+ +------------------------------------------------------------------------------------------------------------------+
+ | V Employment History                                                                             + Add More Rows |                         
+ +----------------------------+----------------------------------------+--------------------+-----------------------+
+ | designation                | Company                                |  from date         | toDate                |
+ +----------------------------+----------------------------------------+--------------------+-----------------------+
+ | ________________________AC | ____________________________________AC | _______________CAL | __________________CAL |
+ +----------------------------+----------------------------------------+--------------------+-----------------------+
+ | ________________________AC | ____________________________________AC | _______________CAL | __________________CAL |
+ +----------------------------+----------------------------------------+--------------------+-----------------------+
+end preformatted
+  
+  
+ 
+
+build project
+
+exit
