@@ -1,25 +1,25 @@
 package com.startupoxygen.craft.server;
 
 public class CraftServerConfiguration {
-	private PortConfiguration portConfiguration;
+	private HostConfiguration hostConfiguration;
 	private HttpConfiguration httpConfiguration;
 	private KeystoreConfiguration keystoreConfiguration;
 	private CipherSuitesConfiguration cipherSuitesConfiguration;
 	private ProcessConfiguration processConfiguration;
 	private ThreadPoolConfiguration threadPoolConfiguration;
 	private WebAppConfiguration webAppConfiguration;
-	private LoggingConfiguration loggingConfiguration;
+	private RequestLogConfiguration requestLogConfiguration;
 
 	public CraftServerConfiguration() {
 		// Default Constructor
 	}
 
-	public PortConfiguration getPortConfiguration() {
-		return this.portConfiguration;
+	public HostConfiguration getHostConfiguration() {
+		return this.hostConfiguration;
 	}
 
-	public void setPortConfiguration(PortConfiguration argPortConfiguration) {
-		this.portConfiguration = argPortConfiguration;
+	public void setHostConfiguration(HostConfiguration argHostConfiguration) {
+		this.hostConfiguration = argHostConfiguration;
 	}
 
 	public HttpConfiguration getHttpConfiguration() {
@@ -75,37 +75,37 @@ public class CraftServerConfiguration {
 		this.webAppConfiguration = argWebAppConfiguration;
 	}
 
-	public LoggingConfiguration getLoggingConfiguration() {
-		return this.loggingConfiguration;
+	public RequestLogConfiguration getRequestLogConfiguration() {
+		return this.requestLogConfiguration;
 	}
 
-	public void setLoggingConfiguration(
-			LoggingConfiguration argLogginConfiguration) {
-		this.loggingConfiguration = argLogginConfiguration;
+	public void setRequestLogConfiguration(
+			RequestLogConfiguration argLogginConfiguration) {
+		this.requestLogConfiguration = argLogginConfiguration;
 	}
 
 	public String getHttpHost() {
-		return this.portConfiguration.getHttpHost();
+		return this.hostConfiguration.getHttpHost();
 	}
 
 	public void setHttpHost(String argHttpHost) {
-		this.portConfiguration.setHttpHost(argHttpHost);
+		this.hostConfiguration.setHttpHost(argHttpHost);
 	}
 
 	public int getHttpPort() {
-		return this.portConfiguration.getHttpPort();
+		return this.hostConfiguration.getHttpPort();
 	}
 
 	public void setHttpPort(int argHttpPort) {
-		this.portConfiguration.setHttpPort(argHttpPort);
+		this.hostConfiguration.setHttpPort(argHttpPort);
 	}
 
 	public int getHttpsPort() {
-		return this.portConfiguration.getHttpsPort();
+		return this.hostConfiguration.getHttpsPort();
 	}
 
 	public void setHttpsPort(int argHttpsPort) {
-		this.portConfiguration.setHttpsPort(argHttpsPort);
+		this.hostConfiguration.setHttpsPort(argHttpsPort);
 	}
 
 	public int getHttpRequestHeaderSize() {
@@ -250,94 +250,94 @@ public class CraftServerConfiguration {
 	}
 
 	public boolean isAccessLogEnabled() {
-		return this.loggingConfiguration.isAccessLogEnabled();
+		return this.requestLogConfiguration.isAccessLogEnabled();
 	}
 
 	public void setAccessLogEnabled(boolean argAccessLogEnabled) {
-		this.loggingConfiguration.setAccessLogEnabled(argAccessLogEnabled);
+		this.requestLogConfiguration.setAccessLogEnabled(argAccessLogEnabled);
 	}
 
 	public String getAccessLogDirectory() {
-		return this.loggingConfiguration.getAccessLogDirectory();
+		return this.requestLogConfiguration.getAccessLogDirectory();
 	}
 
 	public void setAccessLogDirectory(String argAccessLogDirectory) {
-		this.loggingConfiguration.setAccessLogDirectory(argAccessLogDirectory);
+		this.requestLogConfiguration.setAccessLogDirectory(argAccessLogDirectory);
 	}
 
 	public String getAccessLogFilename() {
-		return this.loggingConfiguration.getAccessLogFilename();
+		return this.requestLogConfiguration.getAccessLogFilename();
 	}
 
 	public void setAccessLogFilename(String argAccessLogFilename) {
-		this.loggingConfiguration.setAccessLogFilename(argAccessLogFilename);
+		this.requestLogConfiguration.setAccessLogFilename(argAccessLogFilename);
 	}
 
 	public int getAccessLogRetainDays() {
-		return this.loggingConfiguration.getAccessLogRetainDays();
+		return this.requestLogConfiguration.getAccessLogRetainDays();
 	}
 
 	public void setAccessLogRetainDays(int argAccessLogRetainDays) {
-		this.loggingConfiguration
+		this.requestLogConfiguration
 				.setAccessLogRetainDays(argAccessLogRetainDays);
 	}
 
 	public boolean isAccessLogAppend() {
-		return this.loggingConfiguration.isAccessLogAppend();
+		return this.requestLogConfiguration.isAccessLogAppend();
 	}
 
 	public void setAccessLogAppend(boolean argAccessLogAppend) {
-		this.loggingConfiguration.setAccessLogAppend(argAccessLogAppend);
+		this.requestLogConfiguration.setAccessLogAppend(argAccessLogAppend);
 	}
 
 	public boolean isAccessLogExtended() {
-		return this.loggingConfiguration.isAccessLogExtended();
+		return this.requestLogConfiguration.isAccessLogExtended();
 	}
 
 	public void setAccessLogExtended(boolean argAccessLogExtended) {
-		this.loggingConfiguration.setAccessLogExtended(argAccessLogExtended);
+		this.requestLogConfiguration.setAccessLogExtended(argAccessLogExtended);
 	}
 
 	public String getAccessLogTimeZone() {
-		return this.loggingConfiguration.getAccessLogTimeZone();
+		return this.requestLogConfiguration.getAccessLogTimeZone();
 	}
 
 	public void setAccessLogTimeZone(String argAccessLogTimeZone) {
-		this.loggingConfiguration.setAccessLogTimeZone(argAccessLogTimeZone);
+		this.requestLogConfiguration.setAccessLogTimeZone(argAccessLogTimeZone);
 	}
 
 	public boolean isAccessLogServerName() {
-		return this.loggingConfiguration.isAccessLogServerName();
+		return this.requestLogConfiguration.isAccessLogServerName();
 	}
 
 	public void setAccessLogServerName(boolean argAccessLogServerName) {
-		this.loggingConfiguration
+		this.requestLogConfiguration
 				.setAccessLogServerName(argAccessLogServerName);
 	}
 
 	public boolean isAccessLogCookies() {
-		return this.loggingConfiguration.isAccessLogCookies();
+		return this.requestLogConfiguration.isAccessLogCookies();
 	}
 
 	public void setAccessLogCookies(boolean argAccessLogCookies) {
-		this.loggingConfiguration.setAccessLogCookies(argAccessLogCookies);
+		this.requestLogConfiguration.setAccessLogCookies(argAccessLogCookies);
 	}
 
 	public boolean isAccessLogEnableLatency() {
-		return this.loggingConfiguration.isAccessLogEnableLatency();
+		return this.requestLogConfiguration.isAccessLogEnableLatency();
 	}
 
 	public void setAccessLogEnableLatency(boolean argAccessLogEnableLatency) {
-		this.loggingConfiguration
+		this.requestLogConfiguration
 				.setAccessLogEnableLatency(argAccessLogEnableLatency);
 	}
 
 	public boolean isStatsOn() {
-		return this.loggingConfiguration.isStatsOn();
+		return this.requestLogConfiguration.isStatsOn();
 	}
 
 	public void setStatsOn(boolean argStatsOn) {
-		this.loggingConfiguration.setStatsOn(argStatsOn);
+		this.requestLogConfiguration.setStatsOn(argStatsOn);
 	}
 
 }

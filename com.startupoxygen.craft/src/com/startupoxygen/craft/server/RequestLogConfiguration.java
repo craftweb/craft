@@ -1,6 +1,6 @@
 package com.startupoxygen.craft.server;
 
-public class LoggingConfiguration {
+public class RequestLogConfiguration {
 	private String accessLogTimeZone;
 	private boolean accessLogEnabled;
 	private String accessLogFilename;
@@ -13,7 +13,7 @@ public class LoggingConfiguration {
 	private boolean accessLogEnableLatency;
 	private boolean accessLogCookies;
 
-	public LoggingConfiguration() {
+	public RequestLogConfiguration() {
 		// Default Constructor
 	}
 

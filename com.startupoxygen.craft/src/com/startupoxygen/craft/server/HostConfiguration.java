@@ -1,11 +1,11 @@
 package com.startupoxygen.craft.server;
 
-public class PortConfiguration {
+public class HostConfiguration {
 	private String httpHost;
 	private int httpPort;
 	private int httpsPort;
 
-	public PortConfiguration() {
+	public HostConfiguration() {
 		// Default Constructor
 	}
 
