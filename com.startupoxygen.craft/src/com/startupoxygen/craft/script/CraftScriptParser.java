@@ -1,4 +1,4 @@
-package com.startupoxygen.craft;
+package com.startupoxygen.craft.script;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

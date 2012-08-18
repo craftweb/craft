@@ -1,4 +1,4 @@
-package com.startupoxygen.craft;
+package com.startupoxygen.craft.script;
 
 import java.util.ArrayList;
 import java.util.List;

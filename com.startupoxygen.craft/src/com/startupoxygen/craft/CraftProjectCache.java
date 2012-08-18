@@ -10,6 +10,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 import com.startupoxygen.craft.metadata.Entity;
 import com.startupoxygen.craft.metadata.Project;
+import com.startupoxygen.craft.script.CraftScriptParser;
 
 public class CraftProjectCache {
 	public static final int CRAFT_DB_PORT = 27017;

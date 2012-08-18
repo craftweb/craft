@@ -10,10 +10,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Test;
 
-import com.startupoxygen.craft.CraftScriptParser;
 import com.startupoxygen.craft.metadata.Entity;
 import com.startupoxygen.craft.metadata.Field;
 import com.startupoxygen.craft.metadata.Project;
+import com.startupoxygen.craft.script.CraftScriptParser;
 
 public class CraftScriptParserTest extends CraftScriptParser {
 
