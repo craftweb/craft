@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="5 seconds">
+
+	<property name="defaultLog" value="console" />
+	<property name="defaultLevel" value="info" />
+
+	<property name="logdir" value="logs" />
+	<property name="defaultPattern"	value="%-30(%d{MM/dd/yyyy HH:mm:ss.SSS} [%thread]) %-5level %logger{32} - %msg%n" />
+	
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${defaultPattern}</pattern>
+		</encoder>
+	</appender>
+	<appender name="craft"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logdir}/craft.log</File>
+		<encoder>
+			<pattern>${defaultPattern}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<maxIndex>10</maxIndex>
+			<FileNamePattern>${logdir}/craft.log.%i</FileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+	</appender>
+<!-- 
+	<logger name="org.eclipse.jetty" additivity="false" level="error">
+		<appender-ref ref="${logdir}/jetty.log" />
+	</logger>
+	<logger name="org.springframework" additivity="false" level="error">
+		<appender-ref ref="${logdir}/spring.log" />
+	</logger>
+ -->
+	<root level="${defaultLevel}">
+		<appender-ref ref="${defaultLog}" />
+	</root>
+</configuration>
