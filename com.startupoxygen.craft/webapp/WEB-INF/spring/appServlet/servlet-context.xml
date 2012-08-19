@@ -8,9 +8,9 @@
 	<annotation-driven />
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/assets/**" location="/assets/" />
-	<!-- <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
 		<beans:property name="prefix" value="/WEB-INF/views/" /> <beans:property 
-		name="suffix" value=".jsp" /> </beans:bean> -->
+		name="suffix" value=".jsp" /> </beans:bean>
 	<beans:bean id="tilesviewResolver"
 		class="org.springframework.web.servlet.view.tiles2.TilesViewResolver"
 		p:order="0" />
