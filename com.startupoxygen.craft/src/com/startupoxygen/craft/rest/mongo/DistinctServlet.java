@@ -7,7 +7,7 @@
  *
 */
 
-package com.startupoxygen.craft.mongo.rest;
+package com.startupoxygen.craft.rest.mongo;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,17 +29,16 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
 
 @SuppressWarnings("serial")
 @WebServlet(name="QueryServlet")
-public class AggregateServlet extends SkeletonMongodbServlet {
+public class DistinctServlet extends SkeletonMongodbServlet {
   
   private final static int MAX_FIELDS_TO_RETURN = 1000;
-  private static final Logger log = LoggerFactory.getLogger(AggregateServlet.class);
+  private static final Logger log = LoggerFactory.getLogger(DistinctServlet.class);
   private ThreadLocal<StringBuilder> tl = new ThreadLocal<StringBuilder>(){
     @Override 
     protected synchronized StringBuilder initialValue(){
@@ -80,18 +80,28 @@ public class AggregateServlet extends SkeletonMongodbServlet {
     InputStream is = req.getInputStream();
     String db_name = req.getParameter( "dbname" );
     String col_name = req.getParameter( "colname" );
+    String key = req.getParameter( "key" );
     if( db_name==null || col_name==null ){
+      String names[]  = req2mongonames( req );
+      if( names!=null ){
+	db_name = names[0];
+	col_name = names[1];
+      }
+      if( db_name==null || col_name==null ){
+	error( res, SC_BAD_REQUEST, Status.get("param name missing") );
+	return;
+      }
+    }
+    if( key==null ){
       error( res, SC_BAD_REQUEST, Status.get("param name missing") );
       return;
     }
-    String skip = req.getParameter( "skip" );
-    String limit = req.getParameter( "limit" );
 
     DB db = mongo.getDB( db_name );
     DBCollection col = db.getCollection( col_name );
 
     BufferedReader r = null;
-    DBObject q=null, sort=null;
+    DBObject q = null;
     try{
 
       r = new BufferedReader( new InputStreamReader(is) ); 
@@ -107,17 +117,6 @@ public class AggregateServlet extends SkeletonMongodbServlet {
 	error( res, SC_BAD_REQUEST, Status.get("can not parse data") );
 	return;
       }
-      // sort param
-      data = r.readLine();
-      if( data!=null ){
-	try{
-	  sort = (DBObject)JSON.parse( data );
-	}
-	catch( JSONParseException e ){
-	  error( res, SC_BAD_REQUEST, Status.get("can not parse sort arg") );
-	  return;
-	}
-      }
 
     }
     finally{
@@ -125,62 +124,19 @@ public class AggregateServlet extends SkeletonMongodbServlet {
 	r.close();
     }
 
-    DBCursor c;
-    if( sort==null )
-      c = col.find( q );
-    else
-      c = col.find( q ).sort( sort );
-    if( c==null ){
+    List l = col.distinct( key, q );
+    if( l==null || l.size()==0 ){
       error( res, SC_NOT_FOUND, Status.get("no documents found") );
       return;
     }
 
-    res.setIntHeader( "X-Documents-Count", c.count() );
-
-    if( limit!=null ){
-      try{
-	c.limit( Math.min(Integer.parseInt(limit), MAX_FIELDS_TO_RETURN) );
-      }catch( NumberFormatException e ){
-	error( res, SC_BAD_REQUEST, Status.get("can not parse limit") );
-	c.close();
-	return;
-      }
-    }
-    else
-      c.limit( MAX_FIELDS_TO_RETURN );
-
-    if( skip!=null ){
-      try{
-	c.skip( Integer.parseInt(skip) );
-      }catch( NumberFormatException e ){
-	error( res, SC_BAD_REQUEST, Status.get("can not parse skip") );
-	c.close();
-	return;
-      }
-    }
+    res.setIntHeader( "X-Documents-Count", l.size() );
 
     StringBuilder buf = tl.get();
     // reset buf
     buf.setLength( 0 );
 
-    int no = 0;
-    buf.append( "[" );
-    while( c.hasNext() ){
-
-      DBObject o = c.next();
-      JSON.serialize( o, buf );
-      buf.append( "," );
-      no++;
-
-    }
-
-    if( no>0 )
-      buf.setCharAt( buf.length()-1, ']' );
-    else
-      buf.append( ']' );
-
-    res.setIntHeader( "X-Documents-Returned", no );
-
+    JSON.serialize( l, buf );
     out_str( req, buf.toString(), "application/json" );
 
   } 
@@ -200,67 +156,38 @@ public class AggregateServlet extends SkeletonMongodbServlet {
 
     String db_name = req.getParameter( "dbname" );
     String col_name = req.getParameter( "colname" );
+    String key = req.getParameter( "key" );
     if( db_name==null || col_name==null ){
+      String names[]  = req2mongonames( req );
+      if( names!=null ){
+	db_name = names[0];
+	col_name = names[1];
+      }
+      if( db_name==null || col_name==null ){
+	error( res, SC_BAD_REQUEST, Status.get("param name missing") );
+	return;
+      }
+    }
+    if( key==null ){
       error( res, SC_BAD_REQUEST, Status.get("param name missing") );
       return;
     }
-    String skip = req.getParameter( "skip" );
-    String limit = req.getParameter( "limit" );
 
     DB db = mongo.getDB( db_name );
     DBCollection col = db.getCollection( col_name );
 
-    DBCursor c = col.find();
-    if( c==null ){
+    List l = col.distinct( key );
+    if( l==null || l.size()==0 ){
       error( res, SC_NOT_FOUND, Status.get("no documents found") );
       return;
     }
 
-    res.setIntHeader( "X-Documents-Count", c.count() );
-
-    if( limit!=null ){
-      try{
-	c.limit( Math.min(Integer.parseInt(limit), MAX_FIELDS_TO_RETURN) );
-      }catch( NumberFormatException e ){
-	error( res, SC_BAD_REQUEST, Status.get("can not parse limit") );
-	c.close();
-	return;
-      }
-    }
-    else
-      c.limit( MAX_FIELDS_TO_RETURN );
-
-    if( skip!=null ){
-      try{
-	c.skip( Integer.parseInt(skip) );
-      }catch( NumberFormatException e ){
-	error( res, SC_BAD_REQUEST, Status.get("can not parse skip") );
-	c.close();
-	return;
-      }
-    }
+    res.setIntHeader( "X-Documents-Count", l.size() );
 
     StringBuilder buf = tl.get();
     buf.setLength( 0 );
 
-    int no = 0;
-    buf.append( "[" );
-    while( c.hasNext() ){
-
-      DBObject o = c.next();
-      JSON.serialize( o, buf );
-      buf.append( "," );
-      no++;
-
-    }
-
-    if( no>0 )
-      buf.setCharAt( buf.length()-1, ']' );
-    else
-      buf.append( ']' );
-
-    res.setIntHeader( "X-Documents-Returned", no );
-
+    JSON.serialize( l, buf );
     out_str( req, buf.toString(), "application/json" );
 
   } 

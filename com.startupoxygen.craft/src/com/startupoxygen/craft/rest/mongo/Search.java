@@ -7,7 +7,7 @@
  *
 */
 
-package com.startupoxygen.craft.mongo.rest;
+package com.startupoxygen.craft.rest.mongo;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 

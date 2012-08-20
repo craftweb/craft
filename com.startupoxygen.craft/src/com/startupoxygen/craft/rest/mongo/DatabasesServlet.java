@@ -7,7 +7,7 @@
  *
 */
 
-package com.startupoxygen.craft.mongo.rest;
+package com.startupoxygen.craft.rest.mongo;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
