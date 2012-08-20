@@ -36,7 +36,8 @@ public class CraftProjectCache {
 			throw new RuntimeException(
 					"exception while initializing mongo template", e);
 		}
-		String craftProjectsDirectoryName = "F:/devhome/workspace/optaamaze/com.startupoxygen.craft/conf/projects";
+		String craftProjectsDirectoryName = "/projects";
+		craftProjectsDirectoryName = this.getClass().getResource(craftProjectsDirectoryName).getFile();
 		File craftProjectsDirectory = new File(craftProjectsDirectoryName);
 		if (craftProjectsDirectory != null && craftProjectsDirectory.exists()
 				&& craftProjectsDirectory.isDirectory()) {

@@ -1,4 +1,4 @@
-package com.startupoxygen.craft;
+package com.startupoxygen.craft.webapp;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,19 +104,22 @@ public class CraftController {
 		PageBean pageBean = createPageBean(argProjectContextPath, argEntityName);
 		argModel.addAttribute(Craft.PAGE_BEAN, pageBean);
 		Map<String, String> dataMap = new LinkedHashMap<String, String>();
+		Map<String, String> modelDataMap = new LinkedHashMap<String, String>();
 		Collection<Field> fields = pageBean.getEntity().getFields();
 		for (Field field : fields) {
-			String name = field.getName();
+			String name = field.getFullyQualifiedName();
 			String[] values = argRequest.getParameterMap().get(name);
 			String value = null;
 			if (values != null && values.length >= 1) {
 				value = values[0];
 			}
+			modelDataMap.put(name, value);
+			name = StringUtils.replace(name, ".", "-");
 			dataMap.put(name, value);
 		}
 		new Craft().insert(pageBean.getProject(), pageBean.getEntity(),
 				dataMap);
-		argModel.addAttribute(Craft.DATAMAP, dataMap);
+		argModel.addAttribute(Craft.DATAMAP, modelDataMap);
 		return Craft.CRAFT_ENTITY_VIEW;
 	}
 
@@ -129,7 +133,7 @@ public class CraftController {
 		Map<String, String> resultedMap = new LinkedHashMap<String, String>();
 		Collection<Field> fields = pageBean.getEntity().getFields();
 		for (Field field : fields) {
-			String name = field.getName();
+			String name = field.getFullyQualifiedName();
 			String[] values = argRequest.getParameterMap().get(name);
 			String value = null;
 			if (values != null && values.length >= 1) {
