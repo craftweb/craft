@@ -23,14 +23,13 @@ import org.mortbay.setuid.SetUIDServer;
 
 public class CraftServer {
 	private CraftServerConfiguration configuration;
-	private List<WebApp> webApps;
 	private Server server;
 
 	public CraftServer() {
 		// Default Constructor
 	}
 
-	private void init() {
+	public void init() {
 		Server newServer = new Server(this.getConfiguration().getHttpPort());
 		if (this.validateProcessConfiguration()) {
 			SetUIDServer setUidServer = new SetUIDServer();
@@ -121,7 +120,7 @@ public class CraftServer {
 
 		ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
 		List<Handler> handlers = new ArrayList<Handler>();
-		for (WebApp webApp : this.webApps) {
+		for (WebApp webApp : this.getConfiguration().getWebAppConfiguration().getWebApps()) {
 			if (webApp.customContextHandler) {
 				ContextHandler contextHandler = new ContextHandler();
 				contextHandler.setContextPath(webApp.contextPath);
