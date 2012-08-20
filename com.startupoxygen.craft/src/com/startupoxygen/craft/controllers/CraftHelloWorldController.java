@@ -1,4 +1,4 @@
-package com.startupoxygen.craft.webapp;
+package com.startupoxygen.craft.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
