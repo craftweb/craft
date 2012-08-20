@@ -7,7 +7,7 @@
  *
  */
 
-package com.startupoxygen.craft.mongo.rest;
+package com.startupoxygen.craft.rest.mongo;
 
 import java.util.Collections;
 import java.util.EnumSet;

@@ -4,8 +4,8 @@ package com.startupoxygen.craft.server;
 public class CraftServerDefaults {
 
 	public static final String DEFAULT_HTTP_HOST = "0.0.0.0";
-	public static final int DEFAULT_HTTP_PORT = 80;
-	public static final int DEFAULT_HTTPS_PORT = 443;
+	public static final int DEFAULT_HTTP_PORT = 8080;
+	public static final int DEFAULT_HTTPS_PORT = 8443;
 	public static final int DEFAULT_THREAD_POOL_SIZE = 100;
 	public static final int DEFAULT_ACCEPTOR_THREAD_SIZE = 4;
 	public static final int DEFAULT_ACCEPTOR_QUEUE_SIZE = 256;
