@@ -16,14 +16,10 @@
 <%@ page import="com.startupoxygen.craft.metadata.Field"%>
 <%
 	PageBean pageBean = (PageBean) request.getAttribute("pageBean");
-	Project project = pageBean.getProject(); 
+	Project project = pageBean.getProject();
 	Entity entity = pageBean.getEntity();
 	Collection<Field> fields = entity.getFields();
-	BasicDBList dbList = new BasicDBList();
 	String entityName = entity.getName();
-	DBCursor dbCursor = (DBCursor) request.getAttribute("summary");
-	Set<String> headers = (Set<String>) request.getAttribute("headers");
-	Iterator<DBObject> dbObjectIterator = dbCursor.iterator();
 %>
 <div class="container-fluid">
 	<div class="well">
@@ -31,46 +27,30 @@
 		<div class="control-group">
 			<div class="controls">
 				<a class="btn btn-primary"
-					href="<%=request.getContextPath()%>/<%=project.getContextPath()%>/<%=entity.getNormalizedName()%>/new">Create
-					New <%=entity.getDisplayName()%></a>
+					href="<%=request.getContextPath()%>/<%=entityName%>/new">Create
+					Another <%=entity.getDisplayName()%></a> <a class="btn btn-primary"
+					href="<%=request.getContextPath()%>/<%=entityName%>/edit">Edit
+					<%=entity.getDisplayName()%></a> <a class="btn btn-primary"
+					href="<%=request.getContextPath()%>/<%=entityName%>/delete">Delete
+					<%=entity.getDisplayName()%></a>
 			</div>
 		</div>
 		<table class="table table-striped table-bordered">
-			<tr>
-				<%
-					for (String header : headers) {
-				%>
-				<th><%=header%></th>
-				<%
-					}
-				%>
-			</tr>
 			<%
-				while (dbObjectIterator.hasNext()) {
-					DBObject dbObject = dbObjectIterator.next();
-					if (dbObject != null) {
-						Map<String, Object> map = dbObject.toMap();
-						Iterator<Entry<String, Object>> iter = map.entrySet()
-								.iterator();
+				Map<String, String> dataMap = (Map<String, String>) request
+						.getAttribute("datamap");
+				Iterator<String> iter = dataMap.keySet().iterator();
+				while (iter.hasNext()) {
+					String key = iter.next();
+					String val = dataMap.get(key);
 			%>
 			<tr>
-				<%
-					while (iter.hasNext()) {
-								Map.Entry<String, Object> entry = iter.next();
-								System.out.println(entry.getKey());
-								Object value = entry.getValue();
-								if (value != null && !(value instanceof BasicDBList)
-										&& !entry.getKey().equals("_class")
-										&& !entry.getKey().equals("_id")) {
-				%>
-				<td><%=value.toString()%></td>
-				<%
-					}
-							}
-						}
-					}
-				%>
+				<td><%=key%></td>
+				<td><%=val%></td>
 			</tr>
+			<%
+				}
+			%>
 		</table>
 	</div>
 </div>

@@ -6,16 +6,18 @@
 		<div class="well">
 			<form class="form-horizontal"
 				action="${craft.getEntityContextPath(request)}/save" method="post">
-				<section class="tab-pane" id="${entity.name}">
+				<div class="tab-pane" id="${entity.name}">
 					<h1>${entity.displayName}</h1>
-					<fieldset name="detail">
-						<!-- <legend>Field Set Caption Goes Here</legend> -->
-						<craft:foreachfield>
-							<craft:field name="${field.name}" />
-						</craft:foreachfield>
-						<craft:entityformactions />
-					</fieldset>
-				</section>
+					<section>
+						<fieldset name="detail">
+							<!-- <legend>Field Set Caption Goes Here</legend> -->
+							<craft:foreachfield>
+								<craft:field name="${field.name}" edit="true" />
+							</craft:foreachfield>
+							<craft:entityformactions />
+						</fieldset>
+					</section>
+				</div>
 			</form>
 		</div>
 	</div>

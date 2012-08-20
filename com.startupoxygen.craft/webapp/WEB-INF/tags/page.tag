@@ -7,6 +7,8 @@
 <%@ tag import="com.startupoxygen.craft.metadata.Entity"%>
 <%@ tag import="com.startupoxygen.craft.metadata.Field"%>
 <%@ tag import="org.apache.commons.lang3.StringUtils"%>
+<%--renders page as specified type. For example a list page could be rendered as PDF or XLS. --%>
+<%@ attribute name="renderas" required="false"%>
 <craft:initcheck />
 <%-- craft:initcheck success --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

@@ -6,7 +6,6 @@
 <%@ tag import="org.apache.commons.lang3.*"%>
 <%@ tag import="java.util.*"%>
 <%@ attribute name="name" required="true"%>
-<%@ attribute name="edit" required="false"%>
 <%@ attribute name="entity" required="false"%>
 <%@ attribute name="project" required="false"%>
 <%@ attribute name="displayName" required="false"%>
@@ -19,7 +18,7 @@
 	Project project = pageBean.getProject();
 	Entity entity = pageBean.getEntity();
 	Field field = entity.getFieldByName(name);
-	if (!craft.isManyToManyOrOneToMany(field)) {
+	if (craft.isManyToManyOrOneToMany(field)) {
 		String varStyleClass = StringUtils.isNotEmpty(styleclass) ? styleclass
 				: "input-xlarge";
 		String varId = StringUtils.isNotEmpty(id) ? id : field
@@ -29,21 +28,10 @@
 		String varName = field.getFullyQualifiedName();
 		String varType = craft.getHtmlInputType(field);
 		String varValue = "";
-		if ("true".equalsIgnoreCase(edit)) {
 %>
-<div class="control-group">
-	<label for="<%=varId%>"><%=varDisplayName%>:</label> <input
-		type="<%=varType%>" class="<%=varStyleClass%>" id="<%=varId%>"
-		name="<%=varName%>" value="<%=varValue%>" />
-</div>
+<section>
+
+</section>
 <%
-	} else {
-%>
-<div class="control-group">
-	<label for="<%=varId%>"><%=varDisplayName%>:</label>
-	<div style="font-face: bold;"><%=varValue%></div>
-</div>
-<%
-	}
 	}
 %>
